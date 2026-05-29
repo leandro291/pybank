@@ -1,6 +1,6 @@
-from banco import Banco
 from abc import ABC, abstractmethod
 from datetime import date
+from decimal import Decimal
 
 class Persona(ABC):
     def __init__(self, nombre: str, dni: str, telefono: str, correo: str):
@@ -32,7 +32,7 @@ class Cliente(Persona):
         self.id_cliente: str = f"P{Cliente._contador:03d}"
         self.numero_cuenta = numero_cuenta
         self.tipo_cuenta = tipo_cuenta
-        self.saldo = saldo
+        self.saldo = Decimal(str(saldo))
         self.__pin = pin
         self.__intentos: int = 0
         self.__bloqueado: bool = False
@@ -98,8 +98,8 @@ class Cliente(Persona):
     def __str__(self) -> str:
         estado = self.__definir_estado()
         return (
-            f"==== Datos del Cliente ====\n"
-            f"  ID Cliente       : {self.id_cliente}\n"
+            f"==== Datos del Cliente: {self.nombre} ====\n"
+            f"  DNI              : {self.dni}\n"
             f"  Número de Cuenta : {self.numero_cuenta}\n"
             f"  Tipo de Cuenta   : {self.tipo_cuenta}\n"
             f"  Saldo            : S/. {self.saldo:.2f}\n"
@@ -109,6 +109,7 @@ class Cliente(Persona):
         )
 
 if __name__ == "__main__":
+    from banco import Banco
 
     banco1 = Banco("Banco de la Nacion", "2415210244", "Av Tarapaca 123", "932905379")
 
