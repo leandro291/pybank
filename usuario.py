@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from datetime import date
 from typing import Dict, TYPE_CHECKING
+from banco import Banco
 import os
 
 if TYPE_CHECKING:
     from cuenta import Cuenta
-    from banco import Banco
 
 os.system("cls")
 
@@ -110,10 +110,9 @@ class Usuario(Persona):
 
     def __init__(self, nombre: str, dni: str, telefono: str, correo: str, fecha_nacimiento: date, banco: Banco):
         super().__init__(nombre, dni, telefono, correo, fecha_nacimiento)
-        self.id_usuario: str = f"P{Usuario._contador:03d}"
+        self.id_usuario: str = f"U{Usuario._contador:03d}"
         self.banco = banco
         self.cuentas: Dict[str, "Cuenta"]  = {}
-        self.activo: bool = True
         self.fecha_registro = date.today()
         Usuario._contador += 1
 
@@ -129,28 +128,7 @@ class Usuario(Persona):
         
         self._banco = valor
 
-    def _definir_estado(self) -> bool:
-        return "Activo" if self.activo else "Inactivo"
-
-    def desactivar_estado(self) -> bool:
-
-        if self.activo:
-            self.activo = False
-            return True
-        else:
-            return False
-        
-    def activar_estado(self) -> bool:
-
-        if not self.activo:
-            self.activo = True
-            return True
-        else:
-            return False
-    
-
     def __str__(self) -> str:
-        estado = self._definir_estado()
         return (
             f"==== Datos del Cliente: {self.nombre} ====\n"
             f"  Id del Usuario   : {self.id_usuario}\n"
@@ -161,12 +139,10 @@ class Usuario(Persona):
             f"  Fecha Nacimiento : {self.fecha_nacimiento}\n"
             f"  Fecha Registro   : {self.fecha_registro}\n"
             f"  Banco            : {self.banco.nombre}\n"
-            f"  Estado           : {estado}\n"
         )
 
 if __name__ == "__main__":
-    from banco import Banco
-
+    
     try:
             
         banco1 = Banco("Banco del Peru", "20252024123", "Av Ferreñafe 288", "932932123")
