@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from datetime import date
-from banco import Banco
 
 class Persona(ABC):
     def __init__(self, nombre: str, dni: str, telefono: str, correo: str, fecha_nacimiento: date):
@@ -9,7 +8,7 @@ class Persona(ABC):
         self.dni = dni
         self.telefono = telefono
         self.correo = correo
-        self.fecha_nacimiento = self.fecha_nacimiento
+        self.fecha_nacimiento = fecha_nacimiento
 
     @abstractmethod
     def __str__(self):
@@ -19,8 +18,8 @@ class Usuario(Persona):
 
     _contador = 1
 
-    def __init__(self, nombre: str, dni: str, telefono: str, correo: str, banco: Banco):
-        super().__init__(nombre, dni, telefono, correo)
+    def __init__(self, nombre: str, dni: str, telefono: str, correo: str, fecha_nacimiento: date, banco: Banco):
+        super().__init__(nombre, dni, telefono, correo, fecha_nacimiento)
         self.id_usuario: str = f"P{Usuario._contador:03d}"
         self.banco = banco
         self.activo: bool = True
@@ -62,4 +61,16 @@ class Usuario(Persona):
         )
 
 if __name__ == "__main__":
-    print()
+    from banco import Banco
+
+    banco1 = Banco("Banco del Peru", "20252024123", "Av Ferreñafe 288", "932932123")
+    cliente1 = Usuario(
+        nombre="Leandro Rojas",
+        dni="60746923",
+        telefono="932905312",
+        correo="lenadrito1@gmail.com",
+        fecha_nacimiento=date(1995, 6, 15),  
+        banco=banco1
+    )
+
+    print(cliente1)
