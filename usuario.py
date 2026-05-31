@@ -2,9 +2,6 @@ from abc import ABC, abstractmethod
 from datetime import date
 from typing import Dict, TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from cuenta import Cuenta, FabricaCuenta
-
 
 class Persona(ABC):
     def __init__(self, nombre: str, dni: str, telefono: str, correo: str, fecha_nacimiento: date):
@@ -112,12 +109,30 @@ class Usuario(Persona):
         self.fecha_registro = date.today()
         Usuario._contador += 1
 
-    def agregar_cuenta(self, cuenta: "Cuenta"):
-        self.cuentas[cuenta.numero_cuenta] = cuenta 
+    @staticmethod
+    def limpiar_string(texto: str):
+        return texto.strip()
+
+    def vincular_cuenta(self, cuenta: "Cuenta") -> bool:
+
+        if not cuenta:
+            return False
+        
+        if cuenta.numero_cuenta in self.cuentas:
+            raise ValueError("Esta cuenta ya se encuentra registrada")
+        
+        self.cuentas[cuenta.numero_cuenta] = cuenta
+        return True
+
+    def obtener_cuenta(self, numero_cuenta: str) -> "Cuenta":
+        
+        numero_limpio = self.limpiar_string(numero_cuenta)
+        cuenta = self.cuentas.get(numero_limpio, None)
+
+        if not cuenta:
+            raise ValueError("Numero de cuenta invalido")
     
-    def _listar_cuentas(self):
-        for cuenta in self.cuentas.values():
-            print(cuenta)
+        return cuenta
 
     def __str__(self) -> str:
         return (
@@ -131,32 +146,49 @@ class Usuario(Persona):
             f"  Fecha Registro   : {self.fecha_registro}\n"
         )
 
-def main():
-    print()
+def main() -> None:
 
-if __name__ == "__main__":
-    
     try:
-            
-        cliente1 = Usuario(
-            nombre="Leandro Rojas",
-            dni="60746923",
-            telefono="932905312",
-            correo="lenadrito1@gmail.com",
-            fecha_nacimiento=date(2006, 6, 15),  
-        )
+        usuario1 = Usuario(nombre="Leandro", dni="60746986", telefono="932002123", correo="lenadrito1@gmail.com", fecha_nacimiento=date(2005, 2, 14))
 
-        ahorro = FabricaCuenta.crear_cuenta(
+        ahorro1 = FabricaCuenta.crear_cuenta(
             tipo="ahorro",
             numero_cuenta="CTA-001",
             saldo=1500.00,
-            usuario=cliente1,
+            usuario=usuario1,
+            pin=123,
             limite_retiros=5,
             tasa_interes=0.035
         )
 
-        cliente1.agregar_cuenta(ahorro)
-        cliente1._listar_cuentas()
+        ahorro2 = FabricaCuenta.crear_cuenta(
+            tipo="ahorro",
+            numero_cuenta="CTA-001",
+            saldo=2500.00,
+            usuario=usuario1,
+            pin=123,
+            limite_retiros=5,
+            tasa_interes=0.035
+        )
+
+        corriente = FabricaCuenta.crear_cuenta(
+            tipo="corriente",
+            numero_cuenta="CTA-002",
+            saldo=1200.00,
+            usuario=usuario1,
+            pin=1234,
+            sobregiro=200
+        )
+
+        usuario1.vincular_cuenta(ahorro1)
+        usuario1.vincular_cuenta(ahorro2)
+        usuario1.vincular_cuenta(corriente)
+        print(usuario1.obtener_cuenta("CTA-002"))
 
     except ValueError as e:
-        print(f"Error {e}")
+        print(f"Error: {e}")
+
+
+if __name__ == "__main__":
+    from cuenta import Cuenta, FabricaCuenta
+    main()
