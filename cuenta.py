@@ -12,7 +12,7 @@ class Cuenta(ABC):
 
     def __init__(self, numero_cuenta: str, saldo: float, usuario: "Usuario"):
         super().__init__()
-        self.id_cuenta = f"C00{Cuenta._contador:03d}"
+        self.id_cuenta = f"C{Cuenta._contador:03d}"
         self.usuario = usuario
         self.numero_cuenta = numero_cuenta
         self.saldo = Decimal(str(saldo))
@@ -108,20 +108,18 @@ class FabricaCuenta:
         
         return clase(numero_cuenta, saldo, usuario, **parametros)
 
+
 if __name__ == "__main__":
     from usuario import Usuario
-    from banco import Banco
 
     try:
 
-        banco1 = Banco("Banco del Peru", "20252024123", "Av Ferreñafe 288", "932932123")
         cliente1 = Usuario(
             nombre="Leandro Rojas",
             dni="60746923",
             telefono="932905312",
             correo="lenadrito1@gmail.com",
             fecha_nacimiento=date(2006, 6, 15),  
-            banco=banco1
         )
 
         ahorro = FabricaCuenta.crear_cuenta(

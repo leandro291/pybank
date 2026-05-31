@@ -1,13 +1,10 @@
 from abc import ABC, abstractmethod
 from datetime import date
 from typing import Dict, TYPE_CHECKING
-from banco import Banco
-import os
 
 if TYPE_CHECKING:
-    from cuenta import Cuenta
+    from cuenta import Cuenta, FabricaCuenta
 
-os.system("cls")
 
 class Persona(ABC):
     def __init__(self, nombre: str, dni: str, telefono: str, correo: str, fecha_nacimiento: date):
@@ -108,25 +105,19 @@ class Usuario(Persona):
 
     _contador = 1
 
-    def __init__(self, nombre: str, dni: str, telefono: str, correo: str, fecha_nacimiento: date, banco: Banco):
+    def __init__(self, nombre: str, dni: str, telefono: str, correo: str, fecha_nacimiento: date):
         super().__init__(nombre, dni, telefono, correo, fecha_nacimiento)
         self.id_usuario: str = f"U{Usuario._contador:03d}"
-        self.banco = banco
         self.cuentas: Dict[str, "Cuenta"]  = {}
         self.fecha_registro = date.today()
         Usuario._contador += 1
 
-    @property
-    def banco(self):
-        return self._banco
+    def agregar_cuenta(self, cuenta: "Cuenta"):
+        self.cuentas[cuenta.numero_cuenta] = cuenta 
     
-    @banco.setter
-    def banco(self, valor: Banco):
-
-        if not isinstance(valor, Banco):
-            raise ValueError("Debe estar relacionado a una clase Banco")
-        
-        self._banco = valor
+    def _listar_cuentas(self):
+        for cuenta in self.cuentas.values():
+            print(cuenta)
 
     def __str__(self) -> str:
         return (
@@ -138,24 +129,34 @@ class Usuario(Persona):
             f"  Correo           : {self.correo}\n"
             f"  Fecha Nacimiento : {self.fecha_nacimiento}\n"
             f"  Fecha Registro   : {self.fecha_registro}\n"
-            f"  Banco            : {self.banco.nombre}\n"
         )
+
+def main():
+    print()
 
 if __name__ == "__main__":
     
     try:
             
-        banco1 = Banco("Banco del Peru", "20252024123", "Av Ferreñafe 288", "932932123")
         cliente1 = Usuario(
             nombre="Leandro Rojas",
             dni="60746923",
             telefono="932905312",
             correo="lenadrito1@gmail.com",
             fecha_nacimiento=date(2006, 6, 15),  
-            banco=banco1
         )
 
-        print(cliente1)
+        ahorro = FabricaCuenta.crear_cuenta(
+            tipo="ahorro",
+            numero_cuenta="CTA-001",
+            saldo=1500.00,
+            usuario=cliente1,
+            limite_retiros=5,
+            tasa_interes=0.035
+        )
+
+        cliente1.agregar_cuenta(ahorro)
+        cliente1._listar_cuentas()
 
     except ValueError as e:
         print(f"Error {e}")
